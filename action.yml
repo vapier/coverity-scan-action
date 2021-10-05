@@ -41,15 +41,17 @@ runs:
   steps:
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       run: |
-        wget -nv \
+        wget https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
           --post-data "token=${TOKEN}&project=${{ inputs.project }}" \
-          -O cov-analysis.tar.gz \
-          https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }}
-        mkdir cov-analysis
-        tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
+          -nv -O cov-analysis.tar.gz
       shell: bash
       env:
         TOKEN: ${{ inputs.token }}
+
+    - run: mkdir cov-analysis
+      shell: bash
+    - run: tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
+      shell: bash
 
     - name: Build with cov-build
       run: |
@@ -57,9 +59,11 @@ runs:
         cov-build --dir cov-int ${{ inputs.command }}
       shell: bash
 
+    - name: Archive results
+      run: tar -czvf cov-int.tgz cov-int
+      shell: bash
     - name: Submit results to Coverity Scan
       run: |
-        tar -czvf cov-int.tgz cov-int
         curl \
           --form project="${{ inputs.project }}" \
           --form token="${TOKEN}" \
