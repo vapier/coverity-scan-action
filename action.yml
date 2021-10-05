@@ -1,0 +1,73 @@
+# https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+
+name: Unofficial Coverity Scan
+description: Run Coverity Scan and upload the results.
+
+inputs:
+  project:
+    description: Project name in Coverity Scan.
+    required: true
+
+  token:
+    description: Secret project token for accessing Coverity Scan.
+    required: true
+
+  email:
+    description: Where Coverity Scan should send notifications.
+    required: true
+
+  build_language:
+    description: Which Coverity Scan language pack to download.
+    default: cxx
+
+  build_platform:
+    description: Which Coverity Scan platform pack to download.
+    default: linux64
+
+  command:
+    description: Command to pass to cov-build.
+    default: make
+
+  version:
+    description: (Informational) The source version being built.
+    default: ${{ github.sha }}
+
+  description:
+    description: (Informational) A description for this particular build.
+    default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
+
+runs:
+  using: composite
+  steps:
+    - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
+      run: |
+        wget -nv \
+          --post-data "token=${TOKEN}&project=${{ inputs.project }}" \
+          -O cov-analysis.tar.gz \
+          https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }}
+        mkdir cov-analysis
+        tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.token }}
+
+    - name: Build with cov-build
+      run: |
+        export PATH="${PWD}/cov-analysis/bin:${PATH}"
+        cov-build --dir cov-int make
+      shell: bash
+
+    - name: Submit results to Coverity Scan
+      run: |
+        tar -czvf cov-int.tgz cov-int
+        curl \
+          --form project="${{ inputs.project }}" \
+          --form token="${TOKEN}" \
+          --form email="${{ inputs.email }}" \
+          --form file=@cov-int.tgz \
+          --form version="${{ inputs.version }}" \
+          --form description="${{ inputs.description }}" \
+          "https://scan.coverity.com/builds?project=${{ inputs.project }}"
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.token }}
