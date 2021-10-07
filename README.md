@@ -28,9 +28,8 @@ jobs:
       CC: ${{ matrix.cc }}
     steps:
     - uses: actions/checkout@v2
-    - uses: vapier/coverity-scan-action@v0
+    - uses: vapier/coverity-scan-action@v1
       with:
-        project: gentoo%2Fpax-utils
         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
 ```
 
@@ -44,13 +43,13 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
   with:
     # Project name in Coverity Scan.
     #
-    # Find this in your dashboard:
+    # This should be as it appears on the Coverity Scan website.
+    # Find it in your dashboard:
     # https://scan.coverity.com/dashboard
     #
-    # This value is URL encoded, so e.g. replace / with %2F.
-    # A GitHub project like "gentoo/pax-utils" would be "gentoo%2Fpax-utils" here.
+    # For example, a GitHub project will look like "gentoo/pax-utils".
     #
-    # REQUIRED.
+    # Default: ${{ github.repository }}
     project: ''
 
     # Secret project token for accessing this project in Coverity Scan.

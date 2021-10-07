@@ -6,7 +6,7 @@ description: Run Coverity Scan and upload the results.
 inputs:
   project:
     description: Project name in Coverity Scan.
-    required: true
+    default: ${{ github.repository }}
 
   token:
     description: Secret project token for accessing Coverity Scan.
@@ -39,10 +39,18 @@ inputs:
 runs:
   using: composite
   steps:
+    # Need to encode the project name when using in URLs and HTTP forms.  Valid
+    # GitHub project names only have / that need encoding, so do an ad-hoc conversion
+    # here.  Wait to see if anyone needs something else.
+    - id: project
+      name: URL encode project name
+      run: echo "::set-output name=project::${{ inputs.project }}" | sed -e 's:/:%2F:g'
+      shell: bash
+
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       run: |
         wget https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
-          --post-data "token=${TOKEN}&project=${{ inputs.project }}" \
+          --post-data "token=${TOKEN}&project=${{ steps.project.outputs.project }}" \
           -nv -O cov-analysis.tar.gz
       shell: bash
       env:
@@ -65,13 +73,13 @@ runs:
     - name: Submit results to Coverity Scan
       run: |
         curl \
-          --form project="${{ inputs.project }}" \
+          --form project="${{ steps.project.outputs.project }}" \
           --form token="${TOKEN}" \
           --form email="${{ inputs.email }}" \
           --form file=@cov-int.tgz \
           --form version="${{ inputs.version }}" \
           --form description="${{ inputs.description }}" \
-          "https://scan.coverity.com/builds?project=${{ inputs.project }}"
+          "https://scan.coverity.com/builds?project=${{ steps.project.outputs.project }}"
       shell: bash
       env:
         TOKEN: ${{ inputs.token }}
