@@ -95,6 +95,11 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
     # Default: 'linux64'
     build_platform: ''
 
+    # Command to prepare for build.
+    #
+    # Default: ''
+    command_prepend: ''
+
     # Command to pass to cov-build.
     #
     # Default: 'make'
