@@ -19,13 +19,7 @@ on:
 
 jobs:
   coverity:
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        cc: [gcc]
-    runs-on: ${{ matrix.os }}
-    env:
-      CC: ${{ matrix.cc }}
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: vapier/coverity-scan-action@v1
@@ -116,6 +110,142 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
     #
     # Default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
     description: ''
+```
+
+# FAQ
+
+## How do I run configure/pre-build steps with this action?
+
+Simply put, you don't!  This action specifically only has a single "build
+command" because that's all the Coverity Scan tools accept.  If you want to
+run `./configure` or `cmake` or something else before the `make`, add a step
+to run those commands first.
+
+A design limitation of GitHub Actions is that all of an action's output &
+sub-steps are logged as a single discrete step, and diving down into each
+sub-step is not clean.  So the more steps that run inside of this
+`vapier/coverity-scan-action` step, the harder it is for you to parse your logs
+when a failure occurs.
+
+For example, you want to do:
+```
+...
+jobs:
+  ...
+    steps:
+    - uses: actions/checkout@v2
+# Here is your dedicated configure/pre-build set of commands.
+    - runs: ./configure ...
+# Then you can run coverity build.
+    - uses: vapier/coverity-scan-action@v1
+      with:
+        ...
+```
+
+## I don't want to specify my e-mail address!
+
+Unfortunately, this is required by Coverity Scan itself, not by this GitHub
+Action.  If you try to submit results to Coverity Scan without an e-mail
+address, it will reject the submission.
+
+If you don't want to list your e-mail address in the config file, you can move
+it to the repository secrets as `COVERITY_SCAN_EMAIL`, and then use
+`email: ${{ secrets.COVERITY_SCAN_EMAIL }}` in your config file.  This will
+prevent leakage to the wider internet, and avoid your e-mail address being
+accidentally used when people fork your repository.
+
+If you don't want to use a single person's e-mail address, you can always use
+an alias or mailing list instead.  Setting up such a thing is way outside the
+scope of this project though :).
+
+## Who sees my code and/or results?
+
+This action executes within the context of your project, so it will see your
+code, but the results are only sent to Coverity Scan, and shown to you.  The
+data is not sent anywhere else, so this action isn't stealing your data :).
+
+Feel free to review or audit the [source code](./action.yml).  It fits on just
+one page!
+
+Of course, this is all independent of the settings on the Coverity Scan website
+which has its own set of ACLs that you can control.
+
+## Can I allow or block pull requests (PRs) from being scanned?
+
+Sure, set the [`on` setting](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on)
+in your GitHub workflow to fire on whatever branch or event you want to include.
+If you only want scans to run on pushes/merges to the main branch, then omit the
+`pull_request` setting.  Or if you want to include PRs, then include the
+setting.
+
+## Do you like M&M's in your cookies?
+
+Of course, [M&M's](https://en.wikipedia.org/wiki/M%26M%27s) cookies are great.
+They're also great in brownies, especially
+[all edges brownies](http://www.bakersedge.com/product_ebp.html).
+
+However, [Smarties](https://en.wikipedia.org/wiki/Smarties) are an abomination
+and you should be ashamed if you put them in either cookies or brownies.
+
+### Are you a corporate shill?
+
+I don't think I am.  Although if Mars or Nestle wanted to sponsor me, I wouldn't
+say no.
+
+# Migrating From Other CIs
+
+## Coverity Scan Travis CI
+
+Coverity Scan offers a `coverity_scan` addon:
+https://scan.coverity.com/travis_ci
+
+Converting from that Travis CI addon to this GitHub Action is fairly trivial.
+Let's convert their example config file over.
+
+The `[*]` lines aren't needed at all with the GitHub Action.
+
+```
+# Travis CI config.
+    env:
+      global:
+        # COVERITY_SCAN_TOKEN
+        # ** specific to your project **
+[1]     - secure: "xxxx"
+
+    addons:
+[2]   coverity_scan:
+        project:
+[3]       name: my_github/my_project
+[*]       version: 1.0
+[*]       description: My Project
+[4]     notification_email: scan_notifications@example.com
+[5]     build_command_prepend: ./configure
+[6]     build_command: make
+[7]     branch_pattern: coverity_scan
+```
+
+```
+# GitHub Action config.
+    name: Coverity Scan
+
+    on:
+      push:
+[7]     branches: [coverity_scan]
+
+    jobs:
+      # NB: "coverity" here can be anything you want.
+      coverity:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - name: Configure
+[5]       run: ./configure
+[2]     - uses: vapier/coverity-scan-action@v1
+          with:
+[4]         email: vapier@gentoo.org
+[3]         project: my_github/my_project
+[1]         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
+[6]         command: make
 ```
 
 # License
