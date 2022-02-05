@@ -30,6 +30,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: vapier/coverity-scan-action@v1
       with:
+        email: ${{ secrets.COVERITY_SCAN_EMAIL }}
         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
 ```
 
@@ -54,14 +55,15 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
 
     # Secret project token for accessing this project in Coverity Scan.
     #
-    # Find this in the project's "Project Settings" tab under "Project token".
+    # Find this in the project's "Project Settings" tab under "Project token" on
+    # the Coverity Scan website.
     #
     # This value should not be specified in the yaml file directly.  Instead it
     # should be set in your repositories secrets.  "COVERITY_SCAN_TOKEN" is a
     # common name here.
     # https://docs.github.com/en/actions/security-guides/encrypted-secrets
     #
-    # You still have to list ${{ secrets.COVERITY_SCAN_TOKEN }} explicitly as
+    # You still have to write ${{ secrets.COVERITY_SCAN_TOKEN }} explicitly as
     # GitHub Actions are not allowed to access secrets directly.
     #
     # REQUIRED.
@@ -70,6 +72,10 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
     # Where Coverity Scan should send notifications.
     #
     # The Coverity Scan tool requires this be set.
+    #
+    # If you don't want to write this in your config files, you can also use a
+    # repository secret.  "COVERITY_SCAN_EMAIL" is a common name.  See the
+    # previous "token" section for more information.
     #
     # REQUIRED.
     email: 'foo@example.com'
@@ -81,6 +87,8 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
     # See the Coverity Scan download page for possible values:
     # https://scan.coverity.com/download
     # The tab strip along the top lists the languages.
+    #
+    # NB: 'cxx' is used for both C & C++ code.
     #
     # Default: 'cxx'
     build_language: 'cxx'
