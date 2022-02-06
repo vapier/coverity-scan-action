@@ -34,7 +34,7 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
 # Usage
 
 ```yaml
-- uses: vapier/coverity-scan-action@v0
+- uses: vapier/coverity-scan-action@v1
   with:
     # Project name in Coverity Scan.
     #
