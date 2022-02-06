@@ -44,6 +44,9 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
     #
     # For example, a GitHub project will look like "gentoo/pax-utils".
     #
+    # NB: This value is case-sensitive and must match what your GitHub project
+    # is registered as exactly!
+    #
     # Default: ${{ github.repository }}
     project: ''
 
@@ -141,6 +144,20 @@ jobs:
       with:
         ...
 ```
+
+## Downloading cov-analysis.tar.gz fails with authentication errors!
+
+If wget fails with `Username/Password Authentication Failed`, double check your
+token and your project settings.  The token must match the Coverity Scan site
+exactly, as must the project name.  Both of these are case sensitive.
+
+Keep in mind that, while GitHub treats your project name case insensitively when
+using git commands or browsing the web site, Coverity Scan does not.  So you
+must use the exact same case that GitHub shows when you visit the project, and
+as Coverity Scan shows it.
+
+You can always copy & paste the wget command into your local terminal to check
+both settings.
 
 ## I don't want to specify my e-mail address!
 
