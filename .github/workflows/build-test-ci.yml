@@ -1,0 +1,33 @@
+# GitHub actions workflow.
+# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
+
+name: Build+Test CI
+
+on:
+  push:
+    branches: [main, gh-actions]
+    tags: [v*]
+  pull_request:
+    types: [opened]
+    branches: [main]
+  # Allow for manual triggers from the web.
+  workflow_dispatch:
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v2
+
+    # Create fake source to build.
+    - name: Generate source
+      run: echo "int main(){}" > test.c
+
+    # Run the action using the current source version.
+    - name: Run self action
+      uses: ./
+      with:
+        email: noreply@localhost.localdomain
+        token: ${{ secrets.COVERITY_SCAN_TOKEN }}
+        command: make test
