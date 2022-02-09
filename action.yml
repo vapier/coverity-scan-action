@@ -28,6 +28,10 @@ inputs:
     description: Command to pass to cov-build.
     default: make
 
+  working-directory:
+    description: Working directory to set for all steps.
+    default: ${{ github.workspace }}
+
   version:
     description: (Informational) The source version being built.
     default: ${{ github.sha }}
@@ -71,7 +75,7 @@ runs:
       id: cov-build-cache
       uses: actions/cache@v2
       with:
-        path: cov-analysis
+        path: ${{ inputs.working-directory }}/cov-analysis
         key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.version }}
 
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
@@ -82,25 +86,30 @@ runs:
           --output cov-analysis.tar.gz \
           --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       env:
         TOKEN: ${{ inputs.token }}
 
     - if: steps.cov-build-cache.outputs.cache-hit != 'true'
       run: mkdir cov-analysis
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
     - if: steps.cov-build-cache.outputs.cache-hit != 'true'
       run: tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: Build with cov-build
       run: |
         export PATH="${PWD}/cov-analysis/bin:${PATH}"
         cov-build --dir cov-int ${{ inputs.command }}
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
 
     - name: Archive results
       run: tar -czvf cov-int.tgz cov-int
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
     - name: Submit results to Coverity Scan
       run: |
         curl \
@@ -112,5 +121,6 @@ runs:
           --form description="${{ inputs.description }}" \
           "https://scan.coverity.com/builds?project=${{ steps.project.outputs.project }}"
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       env:
         TOKEN: ${{ inputs.token }}

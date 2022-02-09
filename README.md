@@ -115,6 +115,14 @@ Here's a non-exhaustive list of projects using this action.
     # Default: 'make'
     command: ''
 
+    # Specify the working-directory of where to run commands.
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrun
+    #
+    # This directory will not be created automatically, it must exist already.
+    #
+    # Default: ${{ github.workspace }}
+    working-directory: ''
+
     # (Informational) The source version being built.
     #
     # Default: ${{ github.sha }}
