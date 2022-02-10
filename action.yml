@@ -49,9 +49,11 @@ runs:
 
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       run: |
-        wget https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
-          --post-data "token=${TOKEN}&project=${{ steps.project.outputs.project }}" \
-          -nv -O cov-analysis.tar.gz
+        curl \
+          https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
+          --no-progress-meter \
+          --output cov-analysis.tar.gz \
+          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
       shell: bash
       env:
         TOKEN: ${{ inputs.token }}
