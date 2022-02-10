@@ -31,6 +31,17 @@ jobs:
 Make sure to define `COVERITY_SCAN_TOKEN` in your
 [project's secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
 
+## Live examples
+
+Here's a non-exhaustive list of projects using this action.
+
+* [Breakpad](https://github.com/google/breakpad/blob/HEAD/.github/workflows/coverity.yml) (configure+make)
+* [LibGD](https://github.com/libgd/libgd/blob/HEAD/.github/workflows/coverity.yml) (cmake+make)
+* [Minijail](https://github.com/google/minijail/blob/HEAD/.github/workflows/coverity.yml) (make)
+* [ncompress](https://github.com/vapier/ncompress/blob/HEAD/.github/workflows/coverity.yml) (make)
+* [OpenRC](https://github.com/OpenRC/openrc/blob/HEAD/.github/workflows/coverity.yml) (meson+ninja)
+* [pax-utils](https://github.com/gentoo/pax-utils/blob/HEAD/.github/workflows/coverity.yml) (make)
+
 # Usage
 
 ```yaml
