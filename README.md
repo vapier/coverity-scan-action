@@ -126,6 +126,20 @@ Here's a non-exhaustive list of projects using this action.
     description: ''
 ```
 
+# Requirements
+
+These tools need to be available.  The default Ubuntu Linux container provides
+them already, so no extra work is needed there.  Other environments (e.g. macOS
+& Windows) have not yet been tested.  Feedback welcome!
+
+* [Bash](https://www.gnu.org/software/bash/): The shell used in steps.
+* [POSIX sed](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/sed.html):
+  Internal text transformation.
+* [GNU tar](https://www.gnu.org/software/tar/): Unpacks Coverity tool.
+* [GNU gzip](https://www.gnu.org/software/gzip/): Decompresses Coverity tool.
+* [curl](https://curl.se/): Downloads Coverity tool & uploads results.
+* Whatever Coverity Scan tool itself needs.
+
 # FAQ
 
 ## How do I run configure/pre-build steps with this action?
