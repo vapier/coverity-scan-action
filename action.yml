@@ -49,8 +49,7 @@ runs:
 
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       run: |
-        curl \
-          https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
+        curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
           --no-progress-meter \
           --output cov-analysis.tar.gz \
           --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
