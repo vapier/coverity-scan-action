@@ -51,20 +51,14 @@ runs:
       run: echo "::set-output name=project::${{ inputs.project }}" | sed -e 's:/:%2F:g'
       shell: bash
 
-    # Assume that Coverity doesn't change the tarball content for caching purposes.
-    # If they do, they'll use a different name.  Would be nice to use etag header,
-    # but that isn't returned on HEAD requests, and using curl -r 0-0 doesn't seem
-    # to work.
-    #
-    # So look for the header using the form:
-    # content-disposition: attachment; filename="cov-analysis-linux64-2020.09.tar.gz"
+    # The Coverity site says the tool is usually updated twice yearly, so the
+    # md5 of download can be used to determine whether there's been an update.
     - id: coverity-cache-lookup
-      name: Lookup Coverity Build Tool version
+      name: Lookup Coverity Build Tool hash
       run: |
+        printf "::set-output name=hash::"; \
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
-          -s -D - -X HEAD \
-          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}" | \
-          sed -n '/content-disposition: attachment; filename/{ s/.*=/::set-output name=version::/; s/"//g; p}'
+          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}&md5=1"
       shell: bash
       env:
         TOKEN: ${{ inputs.token }}
@@ -76,7 +70,7 @@ runs:
       uses: actions/cache@v2
       with:
         path: ${{ inputs.working-directory }}/cov-analysis
-        key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.version }}
+        key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.hash }}
 
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       if: steps.cov-build-cache.outputs.cache-hit != 'true'
