@@ -79,26 +79,19 @@ runs:
         path: ${{ inputs.working-directory }}/cov-analysis
         key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.hash }}
 
-    - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
+    - name: Install Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
       if: steps.cov-build-cache.outputs.cache-hit != 'true'
       run: |
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
           --no-progress-meter \
           --output cov-analysis.tar.gz \
-          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
+          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}" &&
+        mkdir cov-analysis &&
+        tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       env:
         TOKEN: ${{ inputs.token }}
-
-    - if: steps.cov-build-cache.outputs.cache-hit != 'true'
-      run: mkdir cov-analysis
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
-    - if: steps.cov-build-cache.outputs.cache-hit != 'true'
-      run: tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
-      shell: bash
-      working-directory: ${{ inputs.working-directory }}
 
     - name: Build with cov-build
       run: |
