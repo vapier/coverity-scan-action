@@ -7,6 +7,7 @@ inputs:
   project:
     description: Project name in Coverity Scan.
     default: ${{ github.repository }}
+    required: false
 
   token:
     description: Secret project token for accessing Coverity Scan.
@@ -19,26 +20,32 @@ inputs:
   build_language:
     description: Which Coverity Scan language pack to download.
     default: cxx
+    required: false
 
   build_platform:
     description: Which Coverity Scan platform pack to download.
     default: linux64
+    required: false
 
   command:
     description: Command to pass to cov-build.
     default: make
+    required: false
 
   working-directory:
     description: Working directory to set for all steps.
     default: ${{ github.workspace }}
+    required: false
 
   version:
     description: (Informational) The source version being built.
     default: ${{ github.sha }}
+    required: false
 
   description:
     description: (Informational) A description for this particular build.
     default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
+    required: false
 
 runs:
   using: composite
