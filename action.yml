@@ -53,15 +53,15 @@ runs:
     # Need to encode the project name when using in URLs and HTTP forms.  Valid
     # GitHub project names only have / that need encoding, so do an ad-hoc conversion
     # here.  Wait to see if anyone needs something else.
-    - id: project
-      name: URL encode project name
+    - name: URL encode project name
+      id: project
       run: echo "::set-output name=project::${{ inputs.project }}" | sed -e 's:/:%2F:g'
       shell: bash
 
     # The Coverity site says the tool is usually updated twice yearly, so the
     # md5 of download can be used to determine whether there's been an update.
-    - id: coverity-cache-lookup
-      name: Lookup Coverity Build Tool hash
+    - name: Lookup Coverity Build Tool hash
+      id: coverity-cache-lookup
       run: |
         printf "::set-output name=hash::"; \
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
