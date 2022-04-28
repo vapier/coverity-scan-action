@@ -47,13 +47,38 @@ inputs:
     default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
     required: false
 
+  ignore-missing-tokens:
+    description: Suppress complaint about missing email/token
+    default: ''
+    required: false
+
 runs:
   using: composite
   steps:
+    # Check for required inputs
+    - name: Check for required inputs
+      id: required-inputs
+      env:
+        EMAIL: ${{ inputs.email }}
+        TOKEN: ${{ inputs.token }}
+      run:
+        echo "::set-output name=configured::${{ env.EMAIL != '' && env.TOKEN != '' }}"
+      shell: bash
+
+    - name: Report not configured
+      env:
+        QUIET: ${{ inputs.ignore-missing-tokens }}
+        GH_ACTION_REPOSITORY: ${{ github.action_repository }}
+        GH_ACTION_REF: ${{ github.action_ref }}
+      if: steps.required-inputs.outputs.configured != 'true' && env.QUIET == ''
+      run: echo "::notice title=Coverity action is not configured::${GH_ACTION_REPOSITORY:-$GITHUB_REPOSITORY}@${GH_ACTION_REF:-$GITHUB_REF_NAME} wasn't configured with email/token and thus can't set up Coverity reporting."
+      shell: bash
+
     # Need to encode the project name when using in URLs and HTTP forms.  Valid
     # GitHub project names only have / that need encoding, so do an ad-hoc conversion
     # here.  Wait to see if anyone needs something else.
     - name: URL encode project name
+      if: steps.required-inputs.outputs.configured == 'true'
       id: project
       run: echo "::set-output name=project::${{ inputs.project }}" | sed -e 's:/:%2F:g'
       shell: bash
@@ -62,6 +87,7 @@ runs:
     # md5 of download can be used to determine whether there's been an update.
     - name: Lookup Coverity Build Tool hash
       id: coverity-cache-lookup
+      if: steps.required-inputs.outputs.configured == 'true'
       run: |
         printf "::set-output name=hash::"; \
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
@@ -73,6 +99,7 @@ runs:
     # Try to cache the tool to avoid downloading 1GB+ archive on every run.
     # Cache miss will add ~30s to create, but cache hit will save minutes.
     - name: Cache Coverity Build Tool
+      if: steps.required-inputs.outputs.configured == 'true'
       id: cov-build-cache
       uses: actions/cache@v2
       with:
@@ -80,7 +107,7 @@ runs:
         key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.hash }}
 
     - name: Install Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
-      if: steps.cov-build-cache.outputs.cache-hit != 'true'
+      if: steps.required-inputs.outputs.configured == 'true' && steps.cov-build-cache.outputs.cache-hit != 'true'
       run: |
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
           --no-progress-meter \
@@ -94,6 +121,7 @@ runs:
         TOKEN: ${{ inputs.token }}
 
     - name: Build with cov-build
+      if: steps.required-inputs.outputs.configured == 'true'
       run: |
         export PATH="${PWD}/cov-analysis/bin:${PATH}"
         cov-build --dir cov-int ${{ inputs.command }}
@@ -101,10 +129,12 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Archive results
+      if: steps.required-inputs.outputs.configured == 'true'
       run: tar -czvf cov-int.tgz cov-int
       shell: bash
       working-directory: ${{ inputs.working-directory }}
     - name: Submit results to Coverity Scan
+      if: steps.required-inputs.outputs.configured == 'true'
       run: |
         curl \
           --form project="${{ steps.project.outputs.project }}" \
