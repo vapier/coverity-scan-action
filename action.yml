@@ -114,7 +114,6 @@ runs:
     - name: Submit results to Coverity Scan
       run: |
         curl \
-          --form project="${{ steps.project.outputs.project }}" \
           --form token="${TOKEN}" \
           --form email="${{ inputs.email }}" \
           --form file=@cov-int.tgz \
