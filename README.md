@@ -21,7 +21,7 @@ jobs:
   coverity:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: vapier/coverity-scan-action@v1
       with:
         email: ${{ secrets.COVERITY_SCAN_EMAIL }}
@@ -169,7 +169,7 @@ For example, you want to do:
 jobs:
   ...
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 # Here is your dedicated configure/pre-build set of commands.
     - runs: ./configure ...
 # Then you can run coverity build.
@@ -287,7 +287,7 @@ The `[*]` lines aren't needed at all with the GitHub Action.
       coverity:
         runs-on: ubuntu-latest
         steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v3
         - name: Configure
 [5]       run: ./configure
 [2]     - uses: vapier/coverity-scan-action@v1

@@ -55,7 +55,7 @@ runs:
     # here.  Wait to see if anyone needs something else.
     - name: URL encode project name
       id: project
-      run: echo "::set-output name=project::${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /+/g'
+      run: echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /+/g' >> $GITHUB_OUTPUT
       shell: bash
 
     # The Coverity site says the tool is usually updated twice yearly, so the
@@ -63,9 +63,9 @@ runs:
     - name: Lookup Coverity Build Tool hash
       id: coverity-cache-lookup
       run: |
-        printf "::set-output name=hash::"; \
-        curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
-          --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}&md5=1"
+        hash=$(curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
+                 --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}&md5=1"); \
+        echo "hash=${hash}" >> $GITHUB_OUTPUT
       shell: bash
       env:
         TOKEN: ${{ inputs.token }}
