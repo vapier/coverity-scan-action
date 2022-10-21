@@ -51,11 +51,12 @@ runs:
   using: composite
   steps:
     # Need to encode the project name when using in URLs and HTTP forms.  Valid
-    # GitHub project names only have / that need encoding, so do an ad-hoc conversion
-    # here.  Wait to see if anyone needs something else.
+    # GitHub project names only have / that need encoding and
+    # Coverity projects with spaces in their names need encoding so do
+    # an ad-hoc conversion here.  Wait to see if anyone needs something else.
     - name: URL encode project name
       id: project
-      run: echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' >> $GITHUB_OUTPUT
+      run: echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /%20/g' >> $GITHUB_OUTPUT
       shell: bash
 
     # The Coverity site says the tool is usually updated twice yearly, so the
