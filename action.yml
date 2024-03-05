@@ -75,7 +75,7 @@ runs:
     # Cache miss will add ~30s to create, but cache hit will save minutes.
     - name: Cache Coverity Build Tool
       id: cov-build-cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ inputs.working-directory }}/cov-analysis
         key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.hash }}
