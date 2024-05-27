@@ -171,7 +171,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 # Here is your dedicated configure/pre-build set of commands.
-    - runs: ./configure ...
+    - run: ./configure ...
 # Then you can run coverity build.
     - uses: vapier/coverity-scan-action@v1
       with:
