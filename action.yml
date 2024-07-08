@@ -47,6 +47,11 @@ inputs:
     default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
     required: false
 
+  dry_run:
+    description: Do everything except the final submission to Coverity Scan.
+    default: false
+    required: false
+
 runs:
   using: composite
   steps:
@@ -113,6 +118,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
     - name: Submit results to Coverity Scan
+      if: ${{ ! inputs.dry_run }}
       run: |
         curl \
           --form token="${TOKEN}" \
