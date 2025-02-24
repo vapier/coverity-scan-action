@@ -36,6 +36,7 @@ Make sure to define `COVERITY_SCAN_TOKEN` in your
 Here's a non-exhaustive list of projects using this action.
 
 * [Breakpad](https://github.com/google/breakpad/blob/HEAD/.github/workflows/coverity.yml) (configure+make)
+* [libexpat](https://github.com/libexpat/libexpat/blob/HEAD/.github/workflows/coverity-scan.yml) (cmake+make)
 * [LibGD](https://github.com/libgd/libgd/blob/HEAD/.github/workflows/coverity.yml) (cmake+make)
 * [Minijail](https://github.com/google/minijail/blob/HEAD/.github/workflows/coverity.yml) (make)
 * [ncompress](https://github.com/vapier/ncompress/blob/HEAD/.github/workflows/coverity.yml) (make)
