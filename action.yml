@@ -61,7 +61,12 @@ runs:
     # an ad-hoc conversion here.  Wait to see if anyone needs something else.
     - name: URL encode project name
       id: project
-      run: echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /%20/g' >> $GITHUB_OUTPUT
+      run: |
+        if command -v jq 2>&1 >/dev/null; then 
+          jq -rn --arg x "${{ inputs.project }}" '$x|"project="+@uri' >> $GITHUB_OUTPUT
+        else
+          echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /%20/g' >> $GITHUB_OUTPUT
+        fi
       shell: bash
 
     # The Coverity site says the tool is usually updated twice yearly, so the
