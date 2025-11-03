@@ -42,6 +42,7 @@ Here's a non-exhaustive list of projects using this action.
 * [ncompress](https://github.com/vapier/ncompress/blob/HEAD/.github/workflows/coverity.yml) (make)
 * [OpenRC](https://github.com/OpenRC/openrc/blob/HEAD/.github/workflows/coverity.yml) (meson+ninja)
 * [pax-utils](https://github.com/gentoo/pax-utils/blob/HEAD/.github/workflows/coverity.yml) (make)
+* [app-mesh](https://github.com/laoshanxi/app-mesh/blob/HEAD/.github/workflows/code-scan-coverity.yml) (cmake+make)
 
 # Usage
 
