@@ -52,6 +52,13 @@ inputs:
     default: false
     required: false
 
+  exclude_dirs:
+    description: >
+      Space-separated list of directories to exclude from Coverity scan.
+      Example: "third_party build generated tests"
+    default: ""
+    required: false
+
 runs:
   using: composite
   steps:
@@ -109,7 +116,23 @@ runs:
     - name: Build with cov-build
       run: |
         export PATH="${PWD}/cov-analysis/bin:${PATH}"
-        cov-build --dir cov-int ${{ inputs.command }}
+        cov-build --help
+
+        EXCLUDE_FLAGS=""
+        CLEAN_EXCLUDES=$(echo "${{ inputs.exclude_dirs }}" | tr '\n\t,' '   ' | xargs)
+        if [ -n "$CLEAN_EXCLUDES" ]; then
+          echo "Detected exclude dirs: $CLEAN_EXCLUDES"
+          EXCLUDE_FLAGS="--fs-capture-search ."
+          for d in $CLEAN_EXCLUDES; do
+            echo "Excluding directory (regex): $d"
+            SAFE_PATTERN=$(echo "$d" | sed 's:/:[/\\\\]:g')
+            EXCLUDE_FLAGS="$EXCLUDE_FLAGS --fs-capture-search-exclude-regex \"${SAFE_PATTERN}\""
+          done
+        else
+          echo "No exclude_dirs provided — using default cov-build behavior"
+        fi
+
+        cov-build --dir cov-int $EXCLUDE_FLAGS ${{ inputs.command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 

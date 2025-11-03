@@ -42,6 +42,7 @@ Here's a non-exhaustive list of projects using this action.
 * [ncompress](https://github.com/vapier/ncompress/blob/HEAD/.github/workflows/coverity.yml) (make)
 * [OpenRC](https://github.com/OpenRC/openrc/blob/HEAD/.github/workflows/coverity.yml) (meson+ninja)
 * [pax-utils](https://github.com/gentoo/pax-utils/blob/HEAD/.github/workflows/coverity.yml) (make)
+* [app-mesh](https://github.com/gentoo/pax-utils/blob/HEAD/.github/workflows/coverity.yml) (cmake+make)
 
 # Usage
 
@@ -133,6 +134,10 @@ Here's a non-exhaustive list of projects using this action.
     #
     # Default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
     description: ''
+
+    # Space-separated list of directories to exclude from analysis.
+    # Example: "third_party build generated tests"
+    exclude_dirs: ''
 ```
 
 # Requirements
@@ -165,6 +170,7 @@ sub-step is not clean.  So the more steps that run inside of this
 when a failure occurs.
 
 For example, you want to do:
+
 ```
 ...
 jobs:
@@ -179,7 +185,7 @@ jobs:
         ...
 ```
 
-## Downloading cov-analysis.tar.gz fails with authentication errors!
+## Downloading cov-analysis.tar.gz fails with authentication errors
 
 If wget fails with `Username/Password Authentication Failed`, double check your
 token and your project settings.  The token must match the Coverity Scan site
@@ -193,7 +199,7 @@ as Coverity Scan shows it.
 You can always copy & paste the wget command into your local terminal to check
 both settings.
 
-## I don't want to specify my e-mail address!
+## I don't want to specify my e-mail address
 
 Unfortunately, this is required by Coverity Scan itself, not by this GitHub
 Action.  If you try to submit results to Coverity Scan without an e-mail
@@ -238,6 +244,14 @@ They're also great in brownies, especially
 However, [Smarties](https://en.wikipedia.org/wiki/Smarties) are an abomination
 and you should be ashamed if you put them in either cookies or brownies.
 
+## How do I skip scanning certain folders?
+
+Use the `exclude_dirs` option. For example:
+
+```
+exclude_dirs: "third_party build generated tests"
+```
+
 ### Are you a corporate shill?
 
 I don't think I am.  Although if Mars or Nestle wanted to sponsor me, I wouldn't
@@ -248,7 +262,7 @@ say no.
 ## Coverity Scan Travis CI
 
 Coverity Scan offers a `coverity_scan` addon:
-https://scan.coverity.com/travis_ci
+<https://scan.coverity.com/travis_ci>
 
 Converting from that Travis CI addon to this GitHub Action is fairly trivial.
 Let's convert their example config file over.
