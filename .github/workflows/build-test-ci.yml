@@ -1,5 +1,5 @@
 # GitHub actions workflow.
-# https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions
+# https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax
 
 name: Build+Test CI
 
@@ -12,6 +12,9 @@ on:
     branches: [main]
   # Allow for manual triggers from the web.
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   self-test:

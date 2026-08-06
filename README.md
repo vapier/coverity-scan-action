@@ -17,6 +17,10 @@ on:
   push:
     branches: [main]
 
+# Job only requires read access to the repository.
+permissions:
+  contents: read
+
 jobs:
   coverity:
     runs-on: ubuntu-latest
