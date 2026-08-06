@@ -58,7 +58,9 @@ Here's a non-exhaustive list of projects using this action.
     # For example, a GitHub project will look like "gentoo/pax-utils".
     #
     # NB: This value is case-sensitive and must match what your GitHub project
-    # is registered as exactly!
+    # is registered as exactly!  If you use a different Coverity project name,
+    # "/" and " " are automatically encoded for you, but other values curently
+    # need to be manually URL (percent) encoded.
     #
     # Default: ${{ github.repository }}
     project: ''

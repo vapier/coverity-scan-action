@@ -55,10 +55,22 @@ inputs:
 runs:
   using: composite
   steps:
-    # Need to encode the project name when using in URLs and HTTP forms.  Valid
-    # GitHub project names only have / that need encoding and
-    # Coverity projects with spaces in their names need encoding so do
-    # an ad-hoc conversion here.  Wait to see if anyone needs something else.
+    # Need to encode the project name when using in URLs and HTTP forms.
+    #
+    # Valid GitHub project names only have / that need encoding:
+    # > https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository
+    # > The repository name must not exceed 100 characters, and can only contain
+    # > ASCII letters, digits, and the characters ., -, and _.
+    #
+    # Coverity projects are allowed a lot more flexibility here:
+    # > https://docs.blackduck.com/r/coverity/2026.6/coverity-documentation/setting-up-projects.html
+    # > Project names are case-sensitive and must be 1 - 256 characters.
+    # > Project names can NOT contain the following special characters:
+    # > : * / \ ` ' "
+    # Which implies everything else in Unicode is allowed?  Seems unlikely.
+    # We'll handle spaces as a common convention.
+    #
+    # Do an ad-hoc conversion here to minimize runtime requirements.
     - name: URL encode project name
       id: project
       run: echo "project=${{ inputs.project }}" | sed -e 's:/:%2F:g' -e 's/ /%20/g' >> $GITHUB_OUTPUT
