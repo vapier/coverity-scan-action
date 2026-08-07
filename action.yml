@@ -33,6 +33,10 @@ inputs:
     default: make
     required: false
 
+  capture_command:
+    description: Arguments to pass to coverity capture.
+    required: false
+
   working-directory:
     description: Working directory to set for all steps.
     default: ${{ github.workspace }}
@@ -124,9 +128,18 @@ runs:
       working-directory: ${{ inputs.working-directory }}
 
     - name: Build with cov-build
+      if: inputs.command != ''
       run: |
         export PATH="${PWD}/cov-analysis/bin:${PATH}"
         cov-build --dir cov-int ${{ inputs.command }}
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Capture project source files
+      if: inputs.capture_command != ''
+      run: |
+        export PATH="${PWD}/cov-analysis/bin:${PATH}"
+        coverity capture --dir cov-int ${{ inputs.capture_command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 

@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 jobs:
-  self-test:
+  self-test-cxx:
     runs-on: ubuntu-latest
     steps:
 
@@ -34,3 +34,22 @@ jobs:
         email: noreply@localhost.localdomain
         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
         command: make test
+
+  self-test-capture:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v7
+
+    # Create fake source to capture.
+    - name: Generate source
+      run: printf '#!/usr/bin/env python3\nprint()\n' > test.py
+
+    # Run the action using the current source version.
+    - name: Run self action
+      uses: ./
+      with:
+        email: noreply@localhost.localdomain
+        token: ${{ secrets.COVERITY_SCAN_TOKEN }}
+        command:
+        capture_command: --project-dir .

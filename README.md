@@ -120,8 +120,27 @@ Here's a non-exhaustive list of projects using this action.
 
     # Command to pass to cov-build.
     #
+    # NB: To disable this step, specify '' as your command.  Use this with the
+    # capture command below to only capture source files.
+    #
     # Default: 'make'
     command: ''
+
+    # Arguments to pass to coverity capture.
+    #
+    # If this is not defined (the default), the step is skipped entirely.
+    #
+    # This is used to capture additional source files, especially for
+    # interpreted languages like JavaScript or Python.
+    # https://docs.blackduck.com/r/coverity/latest/coverity-documentation/coverity-capture.html
+    #
+    # If you're not sure what to use, then let Coverity scan things for you:
+    # --project-dir .
+    #
+    # NB: The --dir cov-int arguments are always passed for you.
+    #
+    # Default: ''
+    capture_command: ''
 
     # Specify the working-directory of where to run commands.
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#defaultsrun
