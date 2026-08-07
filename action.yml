@@ -111,7 +111,7 @@ runs:
         curl https://scan.coverity.com/download/${{ inputs.build_language }}/${{ inputs.build_platform }} \
           --fail \
           --no-progress-meter \
-          --output cov-analysis.tar.gz \
+          --output cov-analysis.bin \
           --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -122,8 +122,16 @@ runs:
       run: mkdir cov-analysis
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-    - if: steps.cov-build-cache.outputs.cache-hit != 'true'
-      run: tar -xzf cov-analysis.tar.gz --strip 1 -C cov-analysis
+    - if: steps.cov-build-cache.outputs.cache-hit != 'true' && startsWith(inputs.build_platform, 'linux')
+      run: tar -xzf cov-analysis.bin --strip 1 -C cov-analysis
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+    - if: steps.cov-build-cache.outputs.cache-hit != 'true' && startsWith(inputs.build_platform, 'win')
+      run: |
+        set -x
+        unzip -d cov-analysis cov-analysis.bin
+        cd cov-analysis
+        mv cov-analysis-win*/* ./
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
