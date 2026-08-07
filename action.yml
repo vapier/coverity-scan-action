@@ -1,6 +1,7 @@
-# https://docs.github.com/en/actions/creating-actions/creating-a-composite-action
+# https://docs.github.com/en/actions/reference/workflows-and-actions/metadata-syntax
 
 name: Unofficial Coverity Scan
+author: Mike Frysinger
 description: Run Coverity Scan and upload the results.
 
 inputs:
