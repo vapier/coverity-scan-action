@@ -140,6 +140,14 @@ Here's a non-exhaustive list of projects using this action.
     #
     # Default: coverity-scan-action ${{ github.repository }} / ${{ github.ref }}
     description: ''
+
+    # Do everything except the final submission to Coverity Scan.
+    #
+    # NB: This looks like a boolean, but GH converts action inputs to strings.
+    # Only "true" will enable dry run mode.
+    #
+    # Default: false
+    dry_run: false
 ```
 
 # Requirements

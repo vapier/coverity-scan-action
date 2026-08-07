@@ -135,7 +135,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
     - name: Submit results to Coverity Scan
-      if: ${{ ! inputs.dry_run }}
+      if: inputs.dry_run != 'true'
       run: |
         curl \
           --form token="${TOKEN}" \
