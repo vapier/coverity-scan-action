@@ -63,7 +63,7 @@ Here's a non-exhaustive list of projects using this action.
     #
     # NB: This value is case-sensitive and must match what your GitHub project
     # is registered as exactly!  If you use a different Coverity project name,
-    # "/" and " " are automatically encoded for you, but other values curently
+    # "/" and " " are automatically encoded for you, but other values currently
     # need to be manually URL (percent) encoded.
     #
     # Default: ${{ github.repository }}
