@@ -48,6 +48,26 @@ Here's a non-exhaustive list of projects using this action.
 * [pax-utils](https://github.com/gentoo/pax-utils/blob/HEAD/.github/workflows/coverity.yml) (make)
 * [app-mesh](https://github.com/laoshanxi/app-mesh/blob/HEAD/.github/workflows/code-scan-coverity.yml) (cmake+make)
 
+# Important Changes
+
+This action follows standard [Semantic Versioning](https://semver.org/) for the
+`vX.Y.Z` tags/releases, and common GitHub Actions conventions for the base `vX`
+tag (which is rewritten to point to the latest `vX.Y.Z` release when ready).
+
+## v2
+
+The `cov-analysis` directory (the Coverity Scan tools) was moved out of the
+`working-directory` (which defaults to the top of the checkout) and into the
+`$RUNNER_TEMP` directory (`runner.temp`).  Any projects that hardcoded paths
+to tools need updating.  The `bin` subdir is still automatically added to the
+`$PATH` when running the compile command.
+
+* Before: `${PWD}/cov-analysis`
+* After: `${RUNNER_TEMP}/cov-analysis`
+
+The `cov-int.tgz` artifact was also relocated to `$RUNNER_TEMP`, but it's
+unlikely anyone manipulated that since it's created & uploaded by this action.
+
 # Usage
 
 ```yaml

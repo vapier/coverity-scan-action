@@ -102,7 +102,7 @@ runs:
       id: cov-build-cache
       uses: actions/cache@v6
       with:
-        path: ${{ inputs.working-directory }}/cov-analysis
+        path: ${{ runner.temp }}/cov-analysis
         key: cov-build-${{ inputs.build_language }}-${{ inputs.build_platform }}-${{ steps.coverity-cache-lookup.outputs.hash }}
 
     - name: Download Coverity Build Tool (${{ inputs.build_language }} / ${{ inputs.build_platform }})
@@ -114,18 +114,18 @@ runs:
           --output cov-analysis.bin \
           --data "token=${TOKEN}&project=${{ steps.project.outputs.project }}"
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ runner.temp }}
       env:
         TOKEN: ${{ inputs.token }}
 
     - if: steps.cov-build-cache.outputs.cache-hit != 'true'
       run: mkdir cov-analysis
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ runner.temp }}
     - if: steps.cov-build-cache.outputs.cache-hit != 'true' && startsWith(inputs.build_platform, 'linux')
       run: tar -xzf cov-analysis.bin --strip 1 -C cov-analysis
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ runner.temp }}
     - if: steps.cov-build-cache.outputs.cache-hit != 'true' && startsWith(inputs.build_platform, 'win')
       run: |
         set -x
@@ -133,12 +133,12 @@ runs:
         cd cov-analysis
         mv cov-analysis-win*/* ./
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ runner.temp }}
 
     - name: Build with cov-build
       if: inputs.command != ''
       run: |
-        export PATH="${PWD}/cov-analysis/bin:${PATH}"
+        export PATH="${RUNNER_TEMP}/cov-analysis/bin:${PATH}"
         cov-build --dir cov-int ${{ inputs.command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
@@ -146,13 +146,13 @@ runs:
     - name: Capture project source files
       if: inputs.capture_command != ''
       run: |
-        export PATH="${PWD}/cov-analysis/bin:${PATH}"
+        export PATH="${RUNNER_TEMP}/cov-analysis/bin:${PATH}"
         coverity capture --dir cov-int ${{ inputs.capture_command }}
       shell: bash
       working-directory: ${{ inputs.working-directory }}
 
     - name: Archive results
-      run: tar -czvf cov-int.tgz cov-int
+      run: tar --force-local -czvf "${RUNNER_TEMP}/cov-int.tgz" cov-int
       shell: bash
       working-directory: ${{ inputs.working-directory }}
     - name: Submit results to Coverity Scan
@@ -166,6 +166,6 @@ runs:
           --form description="${{ inputs.description }}" \
           "https://scan.coverity.com/builds?project=${{ steps.project.outputs.project }}"
       shell: bash
-      working-directory: ${{ inputs.working-directory }}
+      working-directory: ${{ runner.temp }}
       env:
         TOKEN: ${{ inputs.token }}
